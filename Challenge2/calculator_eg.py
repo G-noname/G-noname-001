@@ -40,7 +40,7 @@ def calc_income_tax_and_remain(income):
 	for item in INCOME_TAX_QUICK_LOOKUP_TABLE:
 		if taxable_part > item.star_point:
 			tax = taxable_part * item.tax_rate - item.quick_subtractor
-			return '{:.2f}'.format(tax),'{:.2f}.format(real_income -tax)
+			return '{:.2f}'.format(tax),'{:.2f}'.format(real_income -tax)
 			
 			
 def main():
