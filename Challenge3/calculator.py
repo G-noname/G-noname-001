@@ -1,35 +1,39 @@
 #!/usr/bin/env python3
 
+import sys,os
+
 class Config(object):
-	def __init__(self,configfile):
+	def __init__(self):
 		self._config={}
-		with open(configfile) as file:
-			for line in file:
-				str1=line.strip().split('=')
-				key=str1[0]
-				value=str1[1]
+	def input_config(self,configfile):
+		with open(configfile) as f:
+			for line in f:
+				str1=line.split('=')
+				key=str1[0].strip()
+				value=str1[1].strip()
 				self._config[key]=value
 	def get_config(self):
 		return self._config
+
 class UserData(object):
-	def __init__(self,userdatafile):
+	def __init__(self):
 		self.userdata={}
-		with open(userdatafile) as file:
-			for line in file:
-				str2=line.strip().split(',')
-				key=str2[0]
-				value=str2[1]
+		with open(userdatafile) as f:
+			for line in f:
+				str2=line.split(',')
+				key=str2[0].strip()
+				value=str2[1].strip()
 				self.userdata[key]=value
 	def calculator(self):
-		JiShuL=int(self._config[JiShuL])
-		JiShuH=int(self._config[JiShuH])
+		JiShuL=float(self._config[JiShuL])
+		JiShuH=float(self_config[JiShuH])
 		b=0
 		for x in self._config.value:
-			x=int(x)
+			x=float(x)
 			b=b+x
 		b=b-JiShuL-JiShuH
 		c=3500
-		for i in self.userdate:
+		for i in self.userdate.key:
 			a=int(self.userdata[i])
 			if a<=JiShuL :
 				a=JiShuL
@@ -61,28 +65,28 @@ class UserData(object):
 			self.userdata[i]=(i+','+str(a)+','+s+','+tt+','+income) 
 
 	def dumptofile(self,outputfile):
-		with open(outputfile,'w') as file:
+		with open(outputfile,'w') as f:
 			for y in self.userdate:
-				file.write(self.userdate[y])
+				f.write(self.userdate[y])
 
-import sys,os,json	
 
 if __name__=='__main__':
+	if len(sys.argv) <= 2:
+		print('Parametor Error')
+		exit()
 	args=sys.argv[1:]
-	index1=args.index('-c')
-	configfile=args[index1+1] 
-	index2=args.index('-d') 
-	inputfile=args[index2+1] 
-	index3=args.index('-o') 
-	outputfile=args[index3+1] 
-	try:
-		if os.path.isfile(configfile) and os.path.isfile(inputfile) and os.path.isfile(outputfile): 
-			config=Config(js)
-			config.get_config
-			userdata=Userdata(js)
-			userdata.calculator()
-			userdata.dumptofile()
-		else:
-			print('file is not exist') 
-	except: print('ERROR')
+	index=args.index('-c')
+	configfile=args[index+1] 
+	index=args.index('-d') 
+	userdatafile=args[index+1] 
+	index=args.index('-o') 
+	outputfile=args[index+1] 
+	if os.path.isfile(configfile) and os.path.isfile(userdatafile) and os.path.isfile(outputfile): 
+		config=Config()
+		config.get_config
+		userdata=UserData()
+		userdata.calculator()
+		userdata.dumptofile()
+	else:
+		print('file is not exist') 
 
