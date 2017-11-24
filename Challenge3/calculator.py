@@ -1,14 +1,68 @@
 #!/usr/bin/env python3
 
-import sys,os
+import sys,csv
+
+from collections import namedtuple
+
+
+Tax_region = namedtuple(
+	'Tax_region',
+	['region', 'tax_rate', 'Ntax']
+)
+
+SINCOME = 3500
+
+TAX_REGION_TUPLE = [
+	Tax_region(80000, 0.45, 13500),
+	Tax_region(55000, 0.35, 5505),
+	Tax_region(35000,0.30,2755),
+	Tax_region(9000,0.25,1005),
+	Tax_region(4500,0.2,555),
+	Tax_region(1500,0.1,105),
+	Tax_region(0,0.03,0)
+]
+
+
+class Args(object):
+
+	def __init__(self):
+		self.args = sys.argv[1:]
+
+	def _value(self,option):
+		try:
+			index = self.args.index(option)
+			return self.args[index+1]
+		except (ValueError, IndexError):
+			print('Parameter Error')
+			exit()
+
+	@property
+	def config_path(self):
+		return self._value('-c')
+	
+	@property
+	def userdata_path(self):
+		return self._value('-d')
+
+	@property
+	def export_path(self):
+		return self._value('-o')
+
+
+args = Args()
+
 
 class Config(object):
+
 	def __init__(self):
-		self._config={}
-	def input_config(self,configfile):
-		with open(configfile) as f:
-			for line in f:
-				str1=line.split('=')
+		self._config=self._read_config()
+	
+	def _read_config(self):
+		config_path = args.config_path
+		congfig ={}
+		with open(config_path) as f:
+			for line in f.readlines:
+				key,value=line.split('=')
 				key=str1[0].strip()
 				value=str1[1].strip()
 				self._config[key]=value
