@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
-import sys,csv
+import sys
+import csv
 
 from collections import namedtuple
 
@@ -55,92 +56,116 @@ args = Args()
 class Config(object):
 
 	def __init__(self):
-		self._config=self._read_config()
+		self.config=self._read_config()
 	
 	def _read_config(self):
 		config_path = args.config_path
-		congfig ={}
+		config ={}
 		with open(config_path) as f:
-			for line in f.readlines:
-				key,value=line.split('=')
-				key=str1[0].strip()
-				value=str1[1].strip()
-				self._config[key]=value
-	def get_config(self):
-		return self._config
+			for line in f.readlines():
+				key, value=line.split('=')
+				key=key.strip()
+				value=value.strip()
+				try:
+					config[key] = float(value)
+				except ValueError:
+					print('Parameter Error')
+					exit()
+		return config
+
+	def _get_config(self,key):
+		try:
+			return self.config[key]
+		except KeyError:
+			print('Config Error')
+			exit()
+
+	@property
+	def sibL(self):
+		return self._get_config('JiShuL')
+
+	@property
+	def sibH(self):
+		return self._get_config('JiShuH')
+
+	@property
+	def sit_rate(self):
+		return sum([
+			self._get_config('YangLao'),
+			self._get_config('YiLiao'),
+			self._get_config('ShiYe'),
+			self._get_config('GongShang'),
+			self._get_config('ShengYu'),
+			self._get_config('GongJiJin')
+		])
+
+config = Config()
+
 
 class UserData(object):
+
 	def __init__(self):
-		self.userdata={}
-		with open(userdatafile) as f:
-			for line in f:
-				str2=line.split(',')
-				key=str2[0].strip()
-				value=str2[1].strip()
-				self.userdata[key]=value
-	def calculator(self):
-		JiShuL=float(self._config[JiShuL])
-		JiShuH=float(self_config[JiShuH])
-		b=0
-		for x in self._config.value:
-			x=float(x)
-			b=b+x
-		b=b-JiShuL-JiShuH
-		c=3500
-		for i in self.userdate.key:
-			a=int(self.userdata[i])
-			if a<=JiShuL :
-				a=JiShuL
-			elif a>=JiShuH:
-				a=JiShuH
-			else:
-				pass
-			s=format(a*b,".2f")
-			z=a*(1-b)-c
-			if z<=0:
-				t=0
-			elif z<=1500:
-				t=z*0.03
-			elif z<=4500:
-				t=z*0.1-105
-			elif z<=9000:
-				t=z*0.2-555
-			elif z<=35000:
-				t=z*0.25-1005
-			elif z<=55000:
-				t=z*0.3-2755
-			elif z<=80000:
-				t=z*0.35-5505
-			else:
-				t=z*0.45-13505
-			tt=format(t,".2f")
-			ic=a*(1-b)-t
-			income=format(ic,".2f")
-			self.userdata[i]=(i+','+str(a)+','+s+','+tt+','+income) 
+		self.userdata = self._read_users_data()
+	
+	def _read_users_data(self):
+		userdata_path = args.userdata_path
+		userdata = []
+		with open(userdata_path) as f:
+			for line in f.readlines():
+				employee_id, income_str = line.strip().split(',')
+				try:
+					income = int(income_str)
+				except ValueError:
+					print('Parameter Error')
+					exit()
+				userdata.append((employee_id,income))
+		return userdata
 
-	def dumptofile(self,outputfile):
-		with open(outputfile,'w') as f:
-			for y in self.userdate:
-				f.write(self.userdate[y])
+	def __iter__(self):
+		return iter(self.userdata)
 
+class Calculator_ITax(object):
 
+	def __init__(self, userdata):
+		self.userdata = userdata
+		
+	@staticmethod
+	def calc_sim(income):
+		if income < config.sibL:
+			return config.sibL * config.sit_rate
+		if income > config.sibH:
+			return config.sibH * config.sit_rate
+		return income * config.sit_rate
+
+	@classmethod
+	def calc_itr(cls,income):
+		social_insurance_money = cls.calc_sim(income)
+		real_income = income - social_insurance_money
+		taxable_part = real_income - SINCOME 
+		if taxable_part <= 0:
+			return '0.00','{:.2f}'.format(real_income)
+		for item in TAX_REGION_TUPLE:
+			if taxable_part > item.region:
+				tax = taxable_part * item.tax_rate - item.Ntax
+				return '{:.2f}'.format(tax),'{:.2f}'.format(real_income -tax)
+
+	def calc_for_all_userdata(self):
+		result = []
+		for employee_id, income in self.userdata:
+			data = [employee_id, income]
+			social_insurance_money = '{:.2f}'.format(self.calc_sim(income))
+			tax, remain = self.calc_itr(income)
+			data += [social_insurance_money, tax, remain]
+			result.append(data)
+		return result
+	
+	def export(self,dafault = 'csv'):
+		result = self.calc_for_all_userdata()
+		with open(args.export_path, 'w', newline='') as f:
+			writer = csv.writer(f)
+			writer.writerows(result)
+
+ 
 if __name__=='__main__':
-	if len(sys.argv) <= 2:
-		print('Parametor Error')
-		exit()
-	args=sys.argv[1:]
-	index=args.index('-c')
-	configfile=args[index+1] 
-	index=args.index('-d') 
-	userdatafile=args[index+1] 
-	index=args.index('-o') 
-	outputfile=args[index+1] 
-	if os.path.isfile(configfile) and os.path.isfile(userdatafile) and os.path.isfile(outputfile): 
-		config=Config()
-		config.get_config
-		userdata=UserData()
-		userdata.calculator()
-		userdata.dumptofile()
-	else:
-		print('file is not exist') 
-
+	calculator = Calculator_ITax(UserData())
+	calculator.export()
