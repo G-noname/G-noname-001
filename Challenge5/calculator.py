@@ -3,6 +3,8 @@
 import sys
 import getopt
 import csv
+import configparser
+import datetime
 from collections import namedtuple
 from multiprocessing import Process, Queue
 
@@ -28,20 +30,22 @@ TAX_REGION_TUPLE = [
 class Args(object):
 
 	def __init__(self):
-		self.opts, self.args = getopt.getopt(sys.argv[1:], "C:", "c:", "d:", "o:")
+		self.opts, self.args = getopt.getopt(sys.argv[1:], "hC:c:d:o:")
 
 	def _value(self,option):
 		try:
 			for o, a in self.opts:
+				if o in ("-h"):
+					print("Usage: calculator.py -C cityname -c configfile -d userdata -o resultdata")
 				if o in option:
 					return a
 					break		
 		except (ValueError, IndexError):
 			print('Parameter Error')
 			exit()
-	
 	@property
-	def 
+	def config_info(self):
+		return self._value('-C')	
 	@property
 	def config_path(self):
 		return self._value('-c')
@@ -65,21 +69,26 @@ class Config(object):
 	
 	def _read_config(self):
 		config_path = args.config_path
-		config ={}
+		config_info = args.config_info.upper()
+		if config_info is None:
+			config_info = DEFAULT
+		config = configparser.ConfigParser()
+		conf = {}
 		with open(config_path) as f:
-			for line in f.readlines():
-				key, value=line.split('=')
-				key=key.strip()
-				value=value.strip()
+			config.readfp(f)
+			options = config.options(config_info)
+			for key in options:
+				value = config.get(config_info, key)	
 				try:
-					config[key] = float(value)
+					conf[key] = float(value)
 				except ValueError:
 					print('Parameter Error')
 					exit()
-		return config
+		return conf
 
 	def _get_config(self,key):
 		try:
+			print(self.config[key])
 			return self.config[key]
 		except KeyError:
 			print('Config Error')
@@ -160,7 +169,8 @@ class Calculator_ITax(object):
 			data = [employee_id, income]
 			social_insurance_money = '{:.2f}'.format(self.calc_sim(income))
 			tax, remain = self.calc_itr(income)
-			data += [social_insurance_money, tax, remain]
+			t = datetime.strftime(datetime.now(), '%Y-%m-%d %H:%M:%S')
+			data += [social_insurance_money, tax, remain, t]
 			result.append(data)
 		return result
 	
