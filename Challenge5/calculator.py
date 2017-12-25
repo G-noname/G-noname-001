@@ -28,17 +28,20 @@ TAX_REGION_TUPLE = [
 class Args(object):
 
 	def __init__(self):
-		self.args = sys.argv[1:]
+		self.opts, self.args = getopt.getopt(sys.argv[1:], "C:", "c:", "d:", "o:")
 
 	def _value(self,option):
 		try:
-			opts, args = getopt.getopt(self.args, "C:"
-			index = self.args.index(option)
-			return self.args[index+1]
+			for o, a in self.opts:
+				if o in option:
+					return a
+					break		
 		except (ValueError, IndexError):
 			print('Parameter Error')
 			exit()
-
+	
+	@property
+	def 
 	@property
 	def config_path(self):
 		return self._value('-c')
