@@ -4,7 +4,7 @@ import sys
 import getopt
 import csv
 import configparser
-import datetime
+from datetime import datetime
 from collections import namedtuple
 from multiprocessing import Process, Queue
 
@@ -30,14 +30,18 @@ TAX_REGION_TUPLE = [
 class Args(object):
 
 	def __init__(self):
+		if len(sys.argv[:]) < 2:
+			print('Parameter Error')
+			exit()
 		self.opts, self.args = getopt.getopt(sys.argv[1:], "hC:c:d:o:")
 
 	def _value(self,option):
 		try:
 			for o, a in self.opts:
-				if o in ("-h"):
+				if o == "-h":
 					print("Usage: calculator.py -C cityname -c configfile -d userdata -o resultdata")
-				if o in option:
+					sys.exit()
+				if o == option:
 					return a
 					break		
 		except (ValueError, IndexError):
@@ -88,7 +92,6 @@ class Config(object):
 
 	def _get_config(self,key):
 		try:
-			print(self.config[key])
 			return self.config[key]
 		except KeyError:
 			print('Config Error')
@@ -96,21 +99,21 @@ class Config(object):
 
 	@property
 	def sibL(self):
-		return self._get_config('JiShuL')
+		return self._get_config('jishul')
 
 	@property
 	def sibH(self):
-		return self._get_config('JiShuH')
+		return self._get_config('jishuh')
 
 	@property
 	def sit_rate(self):
 		return sum([
-			self._get_config('YangLao'),
-			self._get_config('YiLiao'),
-			self._get_config('ShiYe'),
-			self._get_config('GongShang'),
-			self._get_config('ShengYu'),
-			self._get_config('GongJiJin')
+			self._get_config('yanglao'),
+			self._get_config('yiliao'),
+			self._get_config('shiye'),
+			self._get_config('gongshang'),
+			self._get_config('shengyu'),
+			self._get_config('gongjijin')
 		])
 
 config = Config()
