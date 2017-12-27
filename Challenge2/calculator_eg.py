@@ -24,7 +24,7 @@ INCOME_TAX_QUICK_LOOKUP_TABLE =[
 SOCIAL_INSURANCE_MONEY_RATE = {
 	'endowent_insurance':0.08,
 	'medical_insurance':0.02,
-	'unemployment_insuranc':0,
+	'unemployment_insuranc':0.005,
 	'employment_injury_insurance':0,
 	'maternity_insurance':0,
 	'public_accumulation_funds':0.06
