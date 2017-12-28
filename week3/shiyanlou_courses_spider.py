@@ -4,11 +4,10 @@ import scrapy
 class ShiyanlouCoursesSpider(scrapy.Spider):
     name = 'shiyanlou-courses'
 
-    def start_requests(self):
-        url_tmp1 = 'https://www.shiyanlou.com/course/?category=all&course_type=all&fee=all&tag=all&page={}'
-        urls = (url_tmp1.format(i) for i in range(1, 23))
-        for url in urls:
-            yield scrapy.Request(url=url, callback=self.parse)
+    @property
+    def start_urls(self):
+        url_tmp1 = 'https://www.shiyanlou.com/courses/?category=all$course_type=all$fee=all&tag=all&page={}'
+        return (url_tmp1.format(i) for i in range(1,23))
 
     def parse(self, response):
         for course in response.css('div.course-body'):
